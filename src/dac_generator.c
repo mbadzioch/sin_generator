@@ -6,7 +6,6 @@
  */
 #include "dac_generator.h"
 #include "stm32f0xx_conf.h"
-#include "stm32f0xx_spi.h"
 
 #define SPI1_SCK GPIO_Pin_5
 #define SPI1_MISO GPIO_Pin_6
@@ -42,7 +41,7 @@ void Spi_Send_Ampl(uint8_t ampl)
 //	    SPI_I2S_ReceiveData(SPI1);
 //	    SPI_I2S_SendData(SPI1, 0xff);
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET);
-    data = SPI_I2S_ReceiveData(SPI1);
+    data = SPI_I2S_ReceiveData16(SPI1);
     GPIO_SetBits(GPIOA, CS);	// DAC #CS = 1;
 
     lock_spi = 0;
@@ -61,7 +60,7 @@ void Spi_SetFreq(uint16_t freq){
 //	    SPI_I2S_ReceiveData(SPI1);
 //	    SPI_I2S_SendData(SPI1, 0xff);
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET);
-    temp = SPI_I2S_ReceiveData(SPI1);
+    temp = SPI_I2S_ReceiveData16(SPI1);
     GPIO_SetBits(GPIOA, CS);	// DAC #CS = 1;
 
 }

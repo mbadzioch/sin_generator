@@ -78,13 +78,13 @@ void main(void)
 	SystemInit();
 	SysTick_Config(SystemCoreClock/200000); //przerwanie co 5us
 
-	IniteUART(38400);
+	UART_Init(38400);
 	Init_dac_generator();
 	
 	NVIC_EnableIRQ(USART1_IRQn);
 	
 
-	// ********** Priorytety przerwañ *******************
+	// ********** Priorytety przerwaï¿½ *******************
 	NVIC_SetPriority (SysTick_IRQn,2);
 	NVIC_SetPriority (USART1_IRQn,0);
 
@@ -145,7 +145,7 @@ void main(void)
 		    break;
     
 		    case COMMAND_AMP_ASK : {
-		    USART_Send_Int (act_ampl);
+		    USART_Send_Int(act_ampl);
 		    USART_Send_String("\r\n");
 		    }
 		    break;

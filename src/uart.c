@@ -24,7 +24,8 @@ void USART_Send_String(char *txt){
 }
 
 
-void USART_Send_Int(uint16_t i){
+void USART_Send_Int(int16_t i)
+{
 	char bufor[50];
 	USART_Send_String( itoa(i, bufor, 10) );
 }
@@ -65,7 +66,8 @@ void USART_Send(volatile char *s)
 
 }*/
 
-void UARTInite(uint32_t baudrate){
+void UART_Init(uint32_t baudrate)
+{
 	USART_InitTypeDef USART_InitStruct;
 	NVIC_InitTypeDef NVIC_InitStruct;
 	GPIO_InitTypeDef GPIO_InitStruct;
