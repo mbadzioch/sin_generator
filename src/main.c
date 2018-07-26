@@ -1,6 +1,7 @@
 #include "stm32f0xx_conf.h"
 #include "uart.h"
 #include "dac_generator.h"
+#include "stm32f0xx_usart.h"
 
 //---------------------------------------------------------------------------------
 
@@ -28,11 +29,7 @@ const uint8_t sin_tab [256] ={128, 131, 134, 137, 140, 143, 146, 149, 152, 155, 
 //---------------------------------------------------------------------------------
 
 volatile uint32_t dds_frq = 4294967;
-volatile uint8_t lock_spi = 0;
-
-
-
-uint16_t t_i, t_i2, dta_start, command, act_frq;
+uint16_t t_i, t_i2, dta_start, command, act_frq=0, act_ampl=0;
 
 //---------------------------------------------------------------------------------
 
@@ -47,7 +44,7 @@ void SysTick_Handler(void) {
     GPIOB->ODR = ( (GPIOB ->ODR ) &  (~(3 << 4)) ) | ( quadr << 4);
 
     if (!lock_spi) {
-    	Spi_Send_Ampl((sin_tab[dds_acc]));
+    	Spi_SetFreq((sin_tab[dds_acc>>24]));
     } 
     
     dds_acc += dds_frq;
@@ -78,25 +75,25 @@ void set_freq ( uint16_t freq) { // set output frequency - unit = 0.01Hz
 
 void main(void)
 {
-	uint16_t act_ampl=0;
-
 	SystemInit();
 	SysTick_Config(SystemCoreClock/200000); //przerwanie co 5us
 
-	UARTInite(38400);
+	IniteUART(38400);
+	Init_dac_generator();
 	
+	NVIC_EnableIRQ(USART1_IRQn);
 	
-	//NVIC_EnableIRQ(USART1_IRQn);
-	
+
 	// ********** Priorytety przerwañ *******************
 	NVIC_SetPriority (SysTick_IRQn,2);
 	NVIC_SetPriority (USART1_IRQn,0);
 
-
+	act_ampl = 0;
 	act_frq = 33300;
 
-	set_ampl (0);
-	set_freq (33300);
+
+	Spi_Send_Ampl(0);
+	Spi_SetFreq(33300);
 		
 	while(1) {
 	
@@ -137,7 +134,7 @@ void main(void)
 		    
 		    case COMMAND_AMP : {
 			if ( ( t_i >= 0 ) && (t_i <= 5000) )  {
-				set_ampl ( (uint8_t) ( (t_i * 255) / 6120 ) );
+				Spi_Send_Ampl( (uint8_t) ( (t_i * 255) / 6120 ) );
 				act_ampl = t_i;
 				USART_Send_String("AMP\r\n");
 		    	}

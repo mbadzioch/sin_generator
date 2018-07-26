@@ -10,8 +10,11 @@
 
 #include "stdio.h"
 
+volatile uint8_t lock_spi;
+
 void Init_dac_generator(void);
-int8_t Spi_Send_Ampl(uint8_t ampl);
+void Spi_Send_Ampl(uint8_t ampl);
+void Spi_SetFreq(uint16_t freq);
 void Spi_Send(uint8_t reg, uint8_t data);
 
 void Init_dac_generator(void);

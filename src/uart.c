@@ -9,6 +9,7 @@
 
 #define DEBUG_BUF_LENGTH 50
 
+char bufor[50]={0};
 
 
 
@@ -24,7 +25,7 @@ void USART_Send_String(char *txt){
 
 
 void USART_Send_Int(uint16_t i){
-	char bufor[100];
+	char bufor[50];
 	USART_Send_String( itoa(i, bufor, 10) );
 }
 
@@ -109,11 +110,11 @@ void UARTInite(uint32_t baudrate){
 	USART_Cmd(USART1, ENABLE);
 
 	// Initialize NVIC
+	//NVIC_SetPriority(USART1_IRQn,0);
 	NVIC_InitStruct.NVIC_IRQChannel = USART1_IRQn;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_InitStruct.NVIC_IRQChannelPriority = 0;
 	NVIC_Init(&NVIC_InitStruct);
-
 
 	//Enable RX interrupt
 	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);

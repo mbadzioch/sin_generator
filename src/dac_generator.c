@@ -24,15 +24,16 @@ static void SPI_PinInit(void);
 void Init_dac_generator(void){
 	SPI_PinInit();
 	SPI_Inite();
-	//DAC_Inite();
+	DAC_Inite();
 }
 
-int8_t Spi_Send_Ampl(uint8_t ampl)
+void Spi_Send_Ampl(uint8_t ampl)
 {
 	uint16_t data=0;
+	lock_spi = 1;
 
 	data = 0x3000 | (ampl << 4);				 // DACa ENABLE
-	//data = 0xB000 | (ampl << 4);			       // DACb ENABLE
+
 
     GPIO_ResetBits(GPIOA, CS);  // DAC #CS = 0;
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
@@ -44,11 +45,24 @@ int8_t Spi_Send_Ampl(uint8_t ampl)
     data = SPI_I2S_ReceiveData(SPI1);
     GPIO_SetBits(GPIOA, CS);	// DAC #CS = 1;
 
-    return data;
+    lock_spi = 0;
 }
 
 void Spi_SetFreq(uint16_t freq){
 	uint16_t temp=0;
+
+
+	temp = 0xB000 | (freq << 4);			       // DACb ENABLE
+
+    GPIO_ResetBits(GPIOA, CS);  // DAC #CS = 0;
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData16(SPI1, temp);
+//	    while(SPI_I2S_GetFlagStatus(SPI1,SPI_I2S_FLAG_TXE)==0);
+//	    SPI_I2S_ReceiveData(SPI1);
+//	    SPI_I2S_SendData(SPI1, 0xff);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET);
+    temp = SPI_I2S_ReceiveData(SPI1);
+    GPIO_SetBits(GPIOA, CS);	// DAC #CS = 1;
 
 }
 
